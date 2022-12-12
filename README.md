@@ -1,2 +1,2 @@
 # SkillKit-Backend
-Backend of the SkillKit Employee Management application, written in NodeJS.
+server for skillKit application written in Node.Js
