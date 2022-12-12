@@ -76,10 +76,14 @@ router.put('/assign/:id',async(req,res) => {
     try {
         const {id} = req.params;
         const {assignedUsers} = req.body;
-        await Project.findByIdAndUpdate(id,{
-            assignedUsers:assignedUsers
-        })
+        await Project.updateMany({id:id},{
+            $set:{
+                assignedUsers:assignedUsers
+            }
+        });
+        const sendData = await Project.findById(id);
         res.send({
+            data:sendData,
             message:EDIT_SUCCESS
         })
     } catch (error) {

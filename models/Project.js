@@ -30,7 +30,7 @@ const ProjectSchema = new mongoose.Schema({
         required: true,
     },
     assignedUsers: {
-        type: [mongoose.Schema.Types.ObjectId],
+        type: [String],
     },
     description:{
         type: String,
