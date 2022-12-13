@@ -2,13 +2,20 @@ const router = require('express').Router();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const Project = require('../../models/Project');
-const { FETCH_SUCCESS, FETCH_FAILED, REGISTER_FAILED, REGISTER_SUCCESS, EDIT_SUCCESS, EDIT_FAILED } = require('../../common/constants');
-bodyParser.urlencoded({extended:true,limit:'50mb'});
+const { FETCH_SUCCESS,
+    FETCH_FAILED,
+    REGISTER_FAILED,
+    REGISTER_SUCCESS,
+    EDIT_SUCCESS,
+    EDIT_FAILED,
+    DELETE_FAILED,
+    DELETE_SUCCESS } = require('../../common/constants');
+bodyParser.urlencoded({ extended: true, limit: '50mb' });
 
 router.use(cors());
 router.use(bodyParser.json());
 
-router.get('/',async(req,res) => {
+router.get('/', async (req, res) => {
     try {
         const data = await Project.find();
         res.send({
@@ -23,9 +30,9 @@ router.get('/',async(req,res) => {
     }
 })
 
-router.post('/',async(req,res) => {
+router.post('/', async (req, res) => {
     try {
-        const {name,version,description,stackUsed,assignedUsers,createdBy,deadline} = req.body;
+        const { name, version, description, stackUsed, assignedUsers, createdBy, deadline } = req.body;
         const newProject = new Project({
             name,
             version,
@@ -38,7 +45,7 @@ router.post('/',async(req,res) => {
         await newProject.save();
         res.send({
             data: newProject,
-            message:REGISTER_SUCCESS
+            message: REGISTER_SUCCESS
         })
     } catch (error) {
         console.log(error);
@@ -48,20 +55,20 @@ router.post('/',async(req,res) => {
     }
 });
 
-router.put('/:id',async(req,res) => {
+router.put('/:id', async (req, res) => {
     try {
-        const {id} = req.params;
-        const {name,version,description,stackUsed,assignedUsers,deadline} = req.body;
-        const updatedProject = Project.findByIdAndUpdate(id,{
-            name:name,
-            version:version,
-            description:description,
-            stackUsed:stackUsed,
-            assignedUsers:assignedUsers,
-            deadline:deadline
+        const { id } = req.params;
+        const { name, version, description, stackUsed, assignedUsers, deadline,status} = req.body;
+        await Project.findByIdAndUpdate(id, {
+            name: name,
+            version: version,
+            description: description,
+            stackUsed: stackUsed,
+            assignedUsers: assignedUsers,
+            deadline: deadline,
+            status:status
         });
         res.send({
-            data: updatedProject,
             message: EDIT_SUCCESS
         })
     } catch (error) {
@@ -72,24 +79,61 @@ router.put('/:id',async(req,res) => {
     }
 });
 
-router.put('/assign/:id',async(req,res) => {
+router.put('/assign/:id', async (req, res) => {
     try {
-        const {id} = req.params;
-        const {assignedUsers} = req.body;
-        await Project.updateMany({id:id},{
-            $set:{
-                assignedUsers:assignedUsers
+        const { id } = req.params;
+        const { assignedUsers } = req.body;
+        await Project.updateMany({ _id: id }, {
+            $set: {
+                assignedUsers: assignedUsers
             }
         });
         const sendData = await Project.findById(id);
         res.send({
-            data:sendData,
-            message:EDIT_SUCCESS
+            data: sendData,
+            message: EDIT_SUCCESS
         })
     } catch (error) {
         console.log(error);
         res.send({
-            message:EDIT_FAILED
+            message: EDIT_FAILED
+        })
+    }
+});
+
+router.put('/status/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const status = req.body?.status;
+        const ans = await Project.findByIdAndUpdate(id,{
+            $set:{
+                status:status
+            }
+        })
+        console.log(ans);
+        res.send({
+            message: EDIT_SUCCESS
+        })
+    } catch (error) {
+        console.log(error);
+        res.send({
+            message: EDIT_FAILED
+        })
+    }
+})
+
+
+router.delete('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        Project.findByIdAndDelete(id);
+        res.send({
+            message: DELETE_SUCCESS
+        })
+    } catch (error) {
+        console.log(error);
+        res.send({
+            message: DELETE_FAILED
         })
     }
 })

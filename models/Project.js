@@ -42,6 +42,10 @@ const ProjectSchema = new mongoose.Schema({
     deadline:{
         type: String,
         default: "N.A"
+    },
+    status:{
+        type:String,
+        default:'pending'
     }
 },{
     timestamps:true
