@@ -8,13 +8,10 @@ router.use(bodyParser.urlencoded({extended:true,limit:'50mb'}));
 router.use(cors());
 
 
-router.post('/metaData', (req, res)=>{
-    const {user_id, address, designation, skills} = req.body;
-
+router.post('/metaData',(req, res)=>{
+    const {user_id, username,fullName,address, designation, skills} = req.body;
     console.log(user_id, address, designation, skills);
-
-    new UserMetaData({user_id, address, designation, skills }).save((err, doc)=>{
-
+    new UserMetaData({user_id,username,fullName,address, designation, skills }).save((err, doc)=>{
         if(err)
         {
             res.send({
@@ -32,11 +29,11 @@ router.post('/metaData', (req, res)=>{
 
 });
 
-router.put('/metaData', (req, res)=>{
+router.put('/metaData', async(req, res)=>{
 
-    const {user_id, address, designation, skills} = req.body;
+    const {user_id,username,fullName,address, designation, skills} = req.body;
 
-    UserMetaData.findOne({user_id}, (err, docs)=>{
+    await UserMetaData.findOne({user_id}, async(err, docs)=>{
         if(err)
         {
             res.send({
@@ -46,7 +43,7 @@ router.put('/metaData', (req, res)=>{
         else
         {
             console.log(docs);
-            UserMetaData.findByIdAndUpdate(docs._id, {address, designation, skills}).then((docs)=>{
+            await UserMetaData.findByIdAndUpdate(docs._id, {username,fullName,address, designation, skills}).then((docs)=>{
                 res.send({
                     data : docs,
                     message : FETCH_SUCCESS
@@ -60,11 +57,11 @@ router.put('/metaData', (req, res)=>{
     })
 });
 
-router.get('/metaData', (req, res)=>{
+router.get('/metaData', async(req, res)=>{
 
     const {user_id} = req.body;
 
-    UserMetaData.findOne({user_id : user_id}, (err, docs)=>{
+    await UserMetaData.findOne({user_id : user_id}, (err, docs)=>{
         if(err)
         {
             console.log(err);
