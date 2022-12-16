@@ -28,7 +28,15 @@ const AddressType = {
 }
 
 const SkillType = {
+    id:{
+        type:Number,
+        required:true,
+    },
     name:{
+        type:String,
+        required:true,
+    },
+    value:{
         type:String,
         required:true,
     },
@@ -39,9 +47,10 @@ const SkillType = {
 }
 
 const MetadataSchema = new mongoose.Schema({
-    user_id:{
+    user_email:{
         type:String,
-        required:true
+        required:true,
+        unique:true
     },
     username:{
         type:String,
@@ -71,6 +80,6 @@ const MetadataSchema = new mongoose.Schema({
     skills:{
         type:[SkillType]
     }
-});
+},{timestamps:true});
 
 module.exports = mongoose.model('metadata',MetadataSchema);

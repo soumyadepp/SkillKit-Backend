@@ -110,7 +110,6 @@ router.put('/status/:id', async (req, res) => {
                 status:status
             }
         })
-        console.log(ans);
         res.send({
             message: EDIT_SUCCESS
         })
