@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const { FETCH_FAILED, FETCH_SUCCESS, EDIT_FAILED, EDIT_SUCCESS } = require('../../common/constants');
+const { FETCH_FAILED, FETCH_SUCCESS, EDIT_FAILED, EDIT_SUCCESS, USER_ALREADY_EXISTS } = require('../../common/constants');
 const User = require('../../models/User');
 const UserMetaData = require('../../models/UserMetaData');
 router.use(bodyParser.urlencoded({extended:true,limit:'50mb'}));
@@ -33,18 +33,26 @@ router.patch('/metadata/basic/:id',async(req,res) => {
     try {
         const {id} = req.params;
         const {username,fullName,designation} = req.body;
-        await UserMetaData.updateMany({user_email:id},{
-            $set:{
-                username:username,
-                fullName:fullName,
-                designation:designation
-            }
-        });
-        const sendData = await UserMetaData.findOne({user_email:id});
-        res.send({
-            data:sendData,
-            message:EDIT_SUCCESS
-        })
+        const existingUsername = await UserMetaData.findOne({username:username});
+        if(existingUsername === null || id === existingUsername?.user_email){
+            await UserMetaData.updateMany({user_email:id},{
+                $set:{
+                    username:username,
+                    fullName:fullName,
+                    designation:designation
+                }
+            });
+            const sendData = await UserMetaData.findOne({user_email:id});
+            res.send({
+                data:sendData,
+                message:EDIT_SUCCESS
+            })
+        }
+        else{
+            res.status(405).send({
+                message: USER_ALREADY_EXISTS
+            })
+        }
     } catch (error) {
         console.log(error);
         res.send({
@@ -116,6 +124,22 @@ router.get('/metaData/:email', async(req, res)=>{
         })
     }
 });
+
+router.get('/metadata',async(req,res) => {
+    try{
+        const allMetadata = await UserMetaData.find();
+        res.send({
+            data: allMetadata,
+            message:FETCH_SUCCESS
+        })
+    }
+    catch(error){
+        console.log(error);
+        res.send({
+            message:FETCH_FAILED
+        })
+    }
+})
 
 
 router.get('/:email',async(req,res) => {

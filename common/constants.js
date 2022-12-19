@@ -10,6 +10,7 @@ const EDIT_SUCCESS = "Updated your data successfully";
 const EDIT_FAILED = "Couldn't edit your data at the moment";
 const DELETE_SUCCESS = "Deleted your data successfully";
 const DELETE_FAILED = "Couldn't delete your data at the moment";
+const USER_ALREADY_EXISTS = "This username is taken. Please try another one.";
 
 
 module.exports = {
@@ -24,5 +25,6 @@ module.exports = {
     EDIT_SUCCESS,
     EDIT_FAILED,
     DELETE_SUCCESS,
-    DELETE_FAILED
+    DELETE_FAILED,
+    USER_ALREADY_EXISTS
 }

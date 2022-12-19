@@ -1,48 +1,33 @@
 const mongoose = require('mongoose');
+const { SkillType, AddressType, TechType } = require('./common');
 
-const AddressType = {
-    street:{
-        type:String,
-        required:true
-    },
-    line1:{
-        type:String,
-        required:true
-    },
-    line2:{
-        type:String,
-        required:true
-    },
-    state:{
-        type:String,
-        required:true
-    },
-    city:{
-        type:String,
-        required:true
-    },
-    pincode:{
-        type:String,
-        required:true
-    }
-}
-
-const SkillType = {
+const ProjectType = {
     id:{
-        type:Number,
-        required:true,
+        type:mongoose.Schema.Types.ObjectId,
+        required:true
     },
     name:{
         type:String,
-        required:true,
-    },
-    value:{
-        type:String,
-        required:true,
-    },
-    image:{
-        type:String,
         required:true
+    },
+    description:{
+        type:String,
+    },
+    stackUsed:{
+        type:{
+            frontend:TechType,
+            backend:[TechType],
+            databases:[TechType]
+        },
+        required:true
+    },
+    deadline:{
+        type:String,
+        default:"N.A."
+    },
+    status:{
+        type:String,
+        default:"pending"
     }
 }
 
@@ -79,6 +64,9 @@ const MetadataSchema = new mongoose.Schema({
     },
     skills:{
         type:[SkillType]
+    },
+    assignedProjects:{
+        type:[ProjectType]
     }
 },{timestamps:true});
 

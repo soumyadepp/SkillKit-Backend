@@ -10,6 +10,7 @@ const { FETCH_SUCCESS,
     EDIT_FAILED,
     DELETE_FAILED,
     DELETE_SUCCESS } = require('../../common/constants');
+const UserMetaData = require('../../models/UserMetaData');
 bodyParser.urlencoded({ extended: true, limit: '50mb' });
 
 router.use(cors());
@@ -58,7 +59,7 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, version, description, stackUsed, assignedUsers, deadline,status} = req.body;
+        const { name, version, description, stackUsed, assignedUsers, deadline, status } = req.body;
         await Project.findByIdAndUpdate(id, {
             name: name,
             version: version,
@@ -66,7 +67,7 @@ router.put('/:id', async (req, res) => {
             stackUsed: stackUsed,
             assignedUsers: assignedUsers,
             deadline: deadline,
-            status:status
+            status: status
         });
         res.send({
             message: EDIT_SUCCESS
@@ -83,11 +84,26 @@ router.put('/assign/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const { assignedUsers } = req.body;
-        await Project.updateMany({ _id: id }, {
-            $set: {
-                assignedUsers: assignedUsers
+        const projectToAdd = await Project.findOne({ _id: id });
+        if (assignedUsers) {
+            for (var x of assignedUsers) {
+                await Project.updateMany({ _id: id }, {
+                    $addToSet: {
+                        assignedUsers: x
+                    }
+                })
+                .then(async() => {
+                    await UserMetaData.updateMany({user_email:x},{
+                        $addToSet:{
+                            assignedProjects:projectToAdd
+                        }
+                    })
+                    .then(() => {
+                        console.log(`Completely updated the data of user ${x}`);
+                    })
+                })
             }
-        });
+        }
         const sendData = await Project.findById(id);
         res.send({
             data: sendData,
@@ -105,9 +121,9 @@ router.put('/status/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const status = req.body?.status;
-        const ans = await Project.findByIdAndUpdate(id,{
-            $set:{
-                status:status
+        const ans = await Project.findByIdAndUpdate(id, {
+            $set: {
+                status: status
             }
         })
         res.send({
