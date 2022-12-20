@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const { FETCH_FAILED, FETCH_SUCCESS, EDIT_FAILED, EDIT_SUCCESS, USER_ALREADY_EXISTS } = require('../../common/constants');
 const User = require('../../models/User');
 const UserMetaData = require('../../models/UserMetaData');
+const {cloudinary} = require('../../common/cloudinary');
+
 router.use(bodyParser.urlencoded({extended:true,limit:'50mb'}));
 router.use(cors());
 
@@ -26,8 +28,8 @@ router.post('/metaData',(req, res)=>{
             })
         }
     })
-
 });
+
 
 router.patch('/metadata/basic/:id',async(req,res) => {
     try {
@@ -58,6 +60,27 @@ router.patch('/metadata/basic/:id',async(req,res) => {
         res.send({
             message: EDIT_FAILED
         })
+    }
+})
+
+router.patch('/metadata/image/:id',async(req,res) => {
+    try {
+        const {id} = req.params;
+        const {image} = req.body;
+        const uploadedResponse = await cloudinary.uploader.upload(image,{
+            upload_preset:'dev_preset'
+        });
+        await UserMetaData.updateOne({user_email:id},{
+            $set:{
+                picture:uploadedResponse.secure_url
+            }
+        });
+        res.send({
+            url:uploadedResponse.secure_url,
+            message:EDIT_SUCCESS
+        })
+    } catch (error) {
+        console.log(error);
     }
 })
 
@@ -109,7 +132,7 @@ router.patch('/metadata/skills/:id',async(req,res) => {
     }
 })
 
-router.get('/metaData/:email', async(req, res)=>{
+router.get('/metadata/:email', async(req, res)=>{
     try {
         const {email} = req.params;
         const metadataByEmail = await UserMetaData.findOne({user_email:email});

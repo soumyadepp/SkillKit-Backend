@@ -10,6 +10,10 @@ const ProjectType = {
         type:String,
         required:true
     },
+    version:{
+        type: String,
+        required: true,
+    },
     description:{
         type:String,
     },
@@ -28,7 +32,11 @@ const ProjectType = {
     status:{
         type:String,
         default:"pending"
-    }
+    },
+    createdBy:{
+        type:String,
+        required: true
+    },
 }
 
 const MetadataSchema = new mongoose.Schema({
@@ -38,6 +46,10 @@ const MetadataSchema = new mongoose.Schema({
         unique:true
     },
     username:{
+        type:String,
+        unique:true,
+    },
+    picture:{
         type:String,
     },
     fullName:{

@@ -117,6 +117,49 @@ router.put('/assign/:id', async (req, res) => {
     }
 });
 
+router.put('/unassign/:id',async(req,res) => {
+    try {
+        const {id} = req.params;
+        const {userToUnassign} = req.body;
+        const projectToUnassign = await Project.findOne({_id: id});
+        console.log(projectToUnassign);
+        await Project.updateMany({_id:id},{
+            $pull:{
+                assignedUsers:userToUnassign
+            }
+        })
+        .then(async() => {
+            await UserMetaData.updateMany({user_email:userToUnassign},{
+                $pull:{
+                    assignedProjects: {
+                        _id: projectToUnassign._id,
+                        name:projectToUnassign.name,
+                        version:projectToUnassign.version,
+                        description:projectToUnassign.description,
+                        stackUsed:projectToUnassign.stackUsed,
+                        deadline:projectToUnassign.deadline,
+                        status:projectToUnassign.status,
+                        createdBy:projectToUnassign.createdBy,
+                    }
+                }
+            })
+            .then(() => {
+                console.log(`Unassigned ${userToUnassign}`);
+            })
+        });
+        res.send({
+            data: userToUnassign,
+            message: EDIT_SUCCESS
+        })
+    } catch (error) {
+        console.log(error);
+        res.send({
+            message:EDIT_FAILED
+        })
+    }
+})
+
+
 router.put('/status/:id', async (req, res) => {
     try {
         const { id } = req.params;
