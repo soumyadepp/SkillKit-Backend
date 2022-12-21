@@ -128,24 +128,33 @@ router.put('/unassign/:id',async(req,res) => {
                 assignedUsers:userToUnassign
             }
         })
-        .then(async() => {
-            await UserMetaData.updateMany({user_email:userToUnassign},{
-                $pull:{
-                    assignedProjects: {
-                        _id: projectToUnassign._id,
-                        name:projectToUnassign.name,
-                        version:projectToUnassign.version,
-                        description:projectToUnassign.description,
-                        stackUsed:projectToUnassign.stackUsed,
-                        deadline:projectToUnassign.deadline,
-                        status:projectToUnassign.status,
-                        createdBy:projectToUnassign.createdBy,
-                    }
+        .then(() => {
+            console.log('Removed from projects');
+        })
+        .catch((err) => {
+            console.log(err);
+            console.log('Failed to remove from projects');
+        })
+        await UserMetaData.updateMany({user_email:userToUnassign},{
+            $pull:{
+                assignedProjects: {
+                    _id: projectToUnassign._id,
+                    name:projectToUnassign.name,
+                    version:projectToUnassign.version,
+                    description:projectToUnassign.description,
+                    stackUsed:projectToUnassign.stackUsed,
+                    deadline:projectToUnassign.deadline,
+                    status:projectToUnassign.status,
+                    createdBy:projectToUnassign.createdBy,
                 }
-            })
-            .then(() => {
-                console.log(`Unassigned ${userToUnassign}`);
-            })
+            }
+        })
+        .then(() => {
+            console.log('removed from users');
+        })
+        .catch((err) => {
+            console.log(err);
+            console.log('failed to remove from users');
         });
         res.send({
             data: userToUnassign,

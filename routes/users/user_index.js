@@ -52,6 +52,7 @@ router.patch('/metadata/basic/:id',async(req,res) => {
         }
         else{
             res.status(405).send({
+                data:existingUsername,
                 message: USER_ALREADY_EXISTS
             })
         }
