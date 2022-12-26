@@ -1,43 +1,5 @@
 const mongoose = require('mongoose');
-const { SkillType, AddressType, TechType } = require('./common');
-
-const ProjectType = {
-    id:{
-        type:mongoose.Schema.Types.ObjectId,
-        required:true
-    },
-    name:{
-        type:String,
-        required:true
-    },
-    version:{
-        type: String,
-        required: true,
-    },
-    description:{
-        type:String,
-    },
-    stackUsed:{
-        type:{
-            frontend:TechType,
-            backend:[TechType],
-            databases:[TechType]
-        },
-        required:true
-    },
-    deadline:{
-        type:String,
-        default:"N.A."
-    },
-    status:{
-        type:String,
-        default:"pending"
-    },
-    createdBy:{
-        type:String,
-        required: true
-    },
-}
+const { SkillType, AddressType, ProjectType,TaskType } = require('./common');
 
 const MetadataSchema = new mongoose.Schema({
     user_email:{
@@ -73,12 +35,19 @@ const MetadataSchema = new mongoose.Schema({
         'business_analyst',
         'associate_software_engineer',
         'senior_software_engineer'],
+        default:'unassigned',
     },
     skills:{
-        type:[SkillType]
+        type:[SkillType],
+        default:[]
     },
     assignedProjects:{
-        type:[ProjectType]
+        type:[ProjectType],
+        default:[],
+    },
+    assignedTasks:{
+        type:[TaskType],
+        default:[]
     }
 },{timestamps:true});
 

@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const TechType = {
     name: {
         type:String,
@@ -98,5 +99,95 @@ const AddressType = {
         required:true
     }
 }
+const ProjectType = {
+    id:{
+        type:mongoose.Schema.Types.ObjectId,
+        required:true
+    },
+    name:{
+        type:String,
+        required:true
+    },
+    version:{
+        type: String,
+        required: true,
+    },
+    description:{
+        type:String,
+    },
+    stackUsed:{
+        type:{
+            frontend:TechType,
+            backend:[TechType],
+            databases:[TechType]
+        },
+        required:true
+    },
+    deadline:{
+        type:String,
+        default:"N.A."
+    },
+    status:{
+        type:String,
+        default:"pending"
+    },
+    createdBy:{
+        type:String,
+        required: true
+    },
+}
 
-module.exports = {AddressType,SkillType,TechType,TransactionType};
+const TaskType = {
+    taskNumber:{
+        type:String,
+        required:true,
+        unique:true
+    },
+    title:{
+        type:String,
+        required:true
+    },
+    description:{
+        type:String,
+        required:true,
+    },
+    project:{
+        type:ProjectType,
+        required:true,
+    },
+    deadline:{
+        type:String,
+        required:true,
+    },
+    assignedBy:{
+        type:String,
+        required:true
+    }
+}
+
+const UserDetailType = {
+    fullName:{
+        type:String,
+        required:true,
+    },
+    username:{
+        type:String,
+        required:true,
+    },
+    picture:{
+        type:String,
+    },
+    user_email:{
+        type:String,
+        required:true,
+        unique:true
+    },
+    designation:{
+        type:String,
+        required:true,
+        default:'unassigned'
+    }
+}
+
+
+module.exports = {AddressType,SkillType,TechType,TransactionType,ProjectType,TaskType,UserDetailType};
