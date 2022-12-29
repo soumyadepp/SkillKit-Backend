@@ -35,6 +35,14 @@ const ProjectSchema = new mongoose.Schema({
     status:{
         type:String,
         default:'pending'
+    },
+    eventId :  {
+        type : String,
+        default : ""
+    },
+    eTag : {
+        type : Number,
+        default : 0
     }
 },{
     timestamps:true

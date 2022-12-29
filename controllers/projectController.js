@@ -25,7 +25,7 @@ exports.getAllProjects = async (req, res) => {
     })
 };
 
-exports.addProject = async(req,res) => {
+exports.addProject = async(req,res, next) => {
     const { name, version, description, stackUsed, assignedUsers, createdBy, deadline } = req.body;
     new Project({name,version,description,stackUsed,assignedUsers,createdBy,deadline}).save((err,doc) => {
         if(err){
@@ -34,27 +34,40 @@ exports.addProject = async(req,res) => {
             });
         }
         else{
-            res.send({
-                data: doc,
-                message: REGISTER_SUCCESS
-            })
+            req.params = {id : doc.id};
+            next();
+            // res.send({
+            //     data: doc,
+            //     message: REGISTER_SUCCESS
+            // })
         }
     })
 };
 
-exports.updateProject = async(req,res) => {
+exports.updateProject = async(req,res,next) => {
     const {id} = req.params;
     const { name, version, description, stackUsed, assignedUsers, deadline, status } = req.body;
+
+    let updation = {
+        name:name,
+        version:version,
+        description:description,
+        stackUsed:stackUsed,
+        assignedUsers:assignedUsers,
+        deadline:deadline,
+        status:status,
+        eventId : req.body.eventId,
+        eTag : req.body.eTag
+    }
+
+    if(!!!req.body.eventId)
+    {
+        delete updation["eventId"];
+        delete updation["eTag"];
+    }
+
     Project.findByIdAndUpdate(id,{
-        $set:{
-            name:name,
-            version:version,
-            description:description,
-            stackUsed:stackUsed,
-            assignedUsers:assignedUsers,
-            deadline:deadline,
-            status:status
-        }
+        $set:updation
     },(err,doc) => {
         if(err){
             res.status(400).send({
@@ -62,10 +75,11 @@ exports.updateProject = async(req,res) => {
             })
         }
         else{
-            res.send({
-                data:doc,
-                message: EDIT_SUCCESS
-            })
+            next();
+            // res.send({
+            //     data:doc,
+            //     message: EDIT_SUCCESS
+            // })
         }
     })
 };
@@ -87,7 +101,7 @@ exports.deleteProject = async(req,res) => {
     })
 };
 
-exports.assignProject = async(req,res) => {
+exports.assignProject = async(req,res,next) => {
     try {
         const { id } = req.params;
         const { assignedUsers } = req.body;
@@ -112,10 +126,11 @@ exports.assignProject = async(req,res) => {
             }
         }
         const sendData = await Project.findById(id);
-        res.send({
-            data: sendData,
-            message: EDIT_SUCCESS
-        })
+        next();
+        // res.send({
+        //     data: sendData,
+        //     message: EDIT_SUCCESS
+        // })
     } catch (error) {
         console.log(error);
         res.status(400).send({
@@ -124,7 +139,7 @@ exports.assignProject = async(req,res) => {
     }
 };
 
-exports.unassignProject = async(req,res) => {
+exports.unassignProject = async(req,res,next) => {
     try {
         const {id} = req.params;
         const {userToUnassign} = req.body;
@@ -148,10 +163,11 @@ exports.unassignProject = async(req,res) => {
                 }
             }
         })
-        res.send({
-            data: userToUnassign,
-            message: EDIT_SUCCESS
-        })
+        next();
+        // res.send({
+        //     data: userToUnassign,
+        //     message: EDIT_SUCCESS
+        // })
     } catch (error) {
         console.log(error);
         res.status(400).send({
