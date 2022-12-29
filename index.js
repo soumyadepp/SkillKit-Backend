@@ -45,7 +45,7 @@ let a = ()=>{
     })
 };
 a();
-setInterval(a,260000);
+setInterval(a,3500000);
 
 app.listen(port, () => {
     console.log(`Listening on port ${process.env.PORT}`);
