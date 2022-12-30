@@ -82,7 +82,7 @@ exports.createEvent  = (req, res, next)=>{
 
     axios.post(`https://calendar.zoho.in/api/v1/calendars/${process.env.CALENDAR_UID}/events?eventdata=${encodedUri}`,null,{
         headers : {
-            'Authorization' : `Bearer ${process.env.ACCESS_TOKEN}`
+            'Authorization' : `Bearer ${global.access_token}`
         }
     }).then((eventDetails)=>{
 
@@ -91,7 +91,8 @@ exports.createEvent  = (req, res, next)=>{
         next();
 
     }).catch((err)=>{
-        console.log(err);
+        // console.log(err);
+        console.log("Failed to add event to the calendar");
         res.send(err);
     })
 }
@@ -103,9 +104,10 @@ exports.updateEvent = (req, res, next)=>{
     Project.findById(id).then((doc)=>{
         const {name,deadline,description,assignedUsers, eventId, eTag} = doc;
 
+        // console.log(global.access_token);
         axios.get(`https://calendar.zoho.in/api/v1/calendars/${process.env.CALENDAR_UID}/events/${eventId}`,{
             headers : {
-                "Authorization" : `Bearer ${process.env.ACCESS_TOKEN}`
+                "Authorization" : `Bearer ${global.access_token}`
             }
         }).then((data)=>{
             
@@ -115,7 +117,7 @@ exports.updateEvent = (req, res, next)=>{
             let encodedUri = prepareObjectForUpdate(currentEvent.title, currentEvent.dateandtime.start,currentEvent.dateandtime.end , description, assignedUsers, currentEvent.etag);
             axios.put(`https://calendar.zoho.in/api/v1/calendars/${process.env.CALENDAR_UID}/events/${eventId}?eventdata=${encodedUri}`,null,{
                 headers : {
-                    "Authorization" : `Bearer ${process.env.ACCESS_TOKEN}`
+                    "Authorization" : `Bearer ${global.access_token}`
                 }
             }).then((e)=>{
                 // console.log("Hello world",e.data.events[0]);
@@ -124,12 +126,14 @@ exports.updateEvent = (req, res, next)=>{
                     message: EDIT_SUCCESS
                 })
             }).catch((err)=>{
-                console.log("Error",err);
+                // console.log("Error",err);
+                console.log("Failed to update the calendar event");
                 res.status(400).send({message : EDIT_FAILED, err : err});
             })
 
         }).catch((err)=>{
-            console.log(err);
+            // console.log(err);
+            console.log("Failed to fetch the event details");
             res.status(400).send({message : EDIT_FAILED, err : err});
         })
 
