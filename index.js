@@ -6,7 +6,7 @@ const axios = require('axios');
 const projectRoutes = require('./routes/projects/project_index');
 const userRoutes = require('./routes/users/user_index');
 const taskRoutes = require('./routes/tasks/task_index');
-const setEnvValue = require('./utils/envUpdator');
+// const setEnvValue = require('./utils/envUpdator');
 
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(express.json({ limit: '50mb' }));
@@ -36,16 +36,19 @@ app.get('/', (req, res) => {
     res.send('Hello world');
 })
 
-let a = ()=>{
+global.access_token;
+
+let refreshAccessToken = ()=>{
     axios.post(`https://accounts.zoho.in/oauth/v2/token?client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}&refresh_token=${process.env.REFRESH_TOKEN}&grant_type=refresh_token`).then((e)=>{
         console.log(e.data.access_token);
-        setEnvValue("ACCESS_TOKEN",e.data.access_token);
+        // setEnvValue("ACCESS_TOKEN",e.data.access_token);
+        global.access_token = e.data.access_token;
     }).catch((err)=>{
-        console.log(err);
+        console.log("Failed to update access token");
     })
 };
-a();
-setInterval(a,260000);
+refreshAccessToken();
+setInterval(refreshAccessToken,3500000);
 
 app.listen(port, () => {
     console.log(`Listening on port ${process.env.PORT}`);
